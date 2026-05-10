@@ -23,7 +23,7 @@ def residualBlock(x, filters, stride=1):
     return x
 
 
-def generateSmallResNet(inputShape):
+def generateModel(inputShape):
 
     inputs = keras.Input(shape=inputShape)
 
