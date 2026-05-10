@@ -13,6 +13,12 @@ def generateModel(inputShape):
     model.add(keras.layers.Conv2D(32, kernel_size=5, activation='tanh'))
     model.add(keras.layers.AveragePooling2D(pool_size=(2,2), strides=2))
 
+    model.add(keras.layers.Conv2D(32, kernel_size=5, activation='tanh'))
+    model.add(keras.layers.AveragePooling2D(pool_size=(2,2), strides=2))
+
+    model.add(keras.layers.Conv2D(32, kernel_size=5, activation='tanh'))
+    model.add(keras.layers.AveragePooling2D(pool_size=(2,2), strides=2))
+
     model.add(keras.layers.Flatten())
 
     model.add(keras.layers.Dense(512, activation='tanh'))
