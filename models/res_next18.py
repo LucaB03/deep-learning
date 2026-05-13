@@ -1,0 +1,40 @@
+import keras
+import tensorflow as tf
+from keras import Sequential, layers, models
+from models.lib import get_augmentation_layer
+
+def generate_models(input_shape=(256, 256, 3), num_classes=45, cardinality=8):
+    def resnext_block(x, filters, stride=1):
+        shortcut = x
+        x = layers.Conv2D(filters, (3, 3), strides=stride, padding="same", groups=cardinality)(x)
+        x = layers.BatchNormalization()(x)
+        x = layers.ReLU()(x)
+        x = layers.Conv2D(filters, (3, 3), strides=1, padding="same")(x)
+        x = layers.BatchNormalization()(x)
+        if stride != 1 or shortcut.shape[-1] != filters:
+            shortcut = layers.Conv2D(filters, (1, 1), strides=stride, padding="same")(shortcut)
+            shortcut = layers.BatchNormalization()(shortcut)
+        x = layers.add([x, shortcut])
+        x = layers.ReLU()(x)
+        return x
+
+    inputs = layers.Input(shape=input_shape)
+    x = get_augmentation_layer()(inputs)
+
+    x = layers.Conv2D(64, (7, 7), strides=2, padding="same")(x)
+    x = layers.BatchNormalization()(x)
+    x = layers.ReLU()(x)
+    x = layers.MaxPooling2D((3, 3), strides=2, padding="same")(x)
+
+    x = resnext_block(x, 64, stride=1)
+    x = resnext_block(x, 128, stride=2)
+    x = resnext_block(x, 256, stride=2)
+    x = resnext_block(x, 512, stride=2)
+
+    x = layers.GlobalAveragePooling2D()(x)
+    outputs = layers.Dense(num_classes, activation="softmax")(x)
+
+    model = models.Model(inputs, outputs, name="ResNeXt18_Scratch")
+    model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=1e-3),
+                  loss="categorical_crossentropy", metrics=["accuracy"])
+    return model
