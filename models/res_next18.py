@@ -36,5 +36,5 @@ def generate_models(input_shape=(256, 256, 3), num_classes=45, cardinality=8):
 
     model = models.Model(inputs, outputs, name="ResNeXt18_Scratch")
     model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=1e-3),
-                  loss="categorical_crossentropy", metrics=["accuracy"])
+                  loss="sparse_categorical_crossentropy", metrics=["accuracy"])
     return model
